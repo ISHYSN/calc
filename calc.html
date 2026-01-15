@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダメージ計算機 - 最終調整版</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f0f2f5; }
+        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
+        h1 { font-size: 1.4rem; color: #1a73e8; margin-bottom: 1.5rem; text-align: center; }
+        .input-group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 0.9rem; color: #555; margin-bottom: 0.5rem; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 1rem; transition: border-color 0.3s; }
+        input:focus { border-color: #1a73e8; outline: none; }
+        
+        .button-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        
+        .toggle-button {
+            flex: 1;
+            padding: 10px 5px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            color: #666;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .toggle-button.active.core { border-color: #1a73e8; background-color: #1a73e8; color: white; }
+        .toggle-button.active.v-skill { border-color: #9c27b0; background-color: #9c27b0; color: white; }
+        
+        .toggle-button span { font-size: 0.75rem; opacity: 0.8; }
+
+        .result-area { margin-top: 1rem; padding: 1.2rem; background: #fffde7; border: 2px solid #fff59d; border-radius: 12px; text-align: center; }
+        .result-label { font-size: 0.9rem; color: #795548; margin-bottom: 0.5rem; }
+        .result-value { font-size: 1.8rem; font-weight: bold; color: #d32f2f; word-break: break-all; }
+        .formula { font-size: 0.75rem; color: #aaa; margin-top: 1.5rem; text-align: center; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>ダメージ計算機</h1>
+    
+    <div class="input-group">
+        <label>最大ダメージ</label>
+        <input type="number" id="maxDamage" value="138" step="any">
+    </div>
+
+    <div class="input-group">
+        <label>敵の防御率 (例: 0.6)</label>
+        <input type="number" id="defenseRate" value="0.6" step="any">
+    </div>
+
+    <div class="input-group">
+        <label>基本無視率 (%)</label>
+        <input type="number" id="ignoreRate" value="60.2285" step="any">
+    </div>
+
+    <div class="button-container">
+        <button type="button" id="specialCoreBtn" class="toggle-button core">
+            特殊コア <span>+15%</span>
+        </button>
+        <button type="button" id="vSkillBtn" class="toggle-button v-skill">
+            Vスキル <span>+15%</span>
+        </button>
+    </div>
+
+    <div class="result-area">
+        <div class="result-label">最終ダメージ</div>
+        <div id="totalDamage" class="result-value">0</div>
+    </div>
+
+    <div class="formula">
+        <div id="currentIgnoreDisplay" style="color:#333; font-weight:bold; margin-bottom: 5px;"></div>
+        計算式: 最大ダメージ × {1 - (防御率 × (1 - 適用無視率))}
+    </div>
+</div>
+
+<script>
+    const maxDamageInput = document.getElementById('maxDamage');
+    const defenseRateInput = document.getElementById('defenseRate');
+    const ignoreRateInput = document.getElementById('ignoreRate');
+    const specialCoreBtn = document.getElementById('specialCoreBtn');
+    const vSkillBtn = document.getElementById('vSkillBtn');
+    const resultDisplay = document.getElementById('totalDamage');
+    const currentIgnoreDisplay = document.getElementById('currentIgnoreDisplay');
+
+    let isCoreActive = false;
+    let isVskillActive = false;
+
+    specialCoreBtn.addEventListener('click', () => {
+        isCoreActive = !isCoreActive;
+        specialCoreBtn.classList.toggle('active', isCoreActive);
+        calculate();
+    });
+
+    vSkillBtn.addEventListener('click', () => {
+        isVskillActive = !isVskillActive;
+        vSkillBtn.classList.toggle('active', isVskillActive);
+        calculate();
+    });
+
+    function calculate() {
+        const d = parseFloat(maxDamageInput.value) || 0;
+        const def = parseFloat(defenseRateInput.value) || 0;
+        const baseIgnore = parseFloat(ignoreRateInput.value) || 0;
+        
+        let bonus = 0;
+        if (isCoreActive) bonus += 15;
+        if (isVskillActive) bonus += 15; // 20から15へ変更
+
+        let totalIgnoreRate = baseIgnore + bonus;
+        if (totalIgnoreRate > 100) totalIgnoreRate = 100;
+
+        const ignoreDecimal = totalIgnoreRate / 100;
+        const result = d * (1 - (def * (1 - ignoreDecimal)));
+        
+        resultDisplay.innerText = result.toLocaleString(undefined, { maximumFractionDigits: 6 });
+        
+        let statusText = `適用無視率: ${totalIgnoreRate.toFixed(4)}%`;
+        if (bonus > 0) statusText += ` (${baseIgnore}% + ボーナス${bonus}%)`;
+        currentIgnoreDisplay.innerText = statusText;
+    }
+
+    [maxDamageInput, defenseRateInput, ignoreRateInput].forEach(input => {
+        input.addEventListener('input', calculate);
+    });
+
+    calculate();
+</script>
+
+</body>
+</html>
