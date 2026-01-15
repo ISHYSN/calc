@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ダメージ計算機 - 最終調整版</title>
+    <title>ダメージ計算機</title>
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f0f2f5; }
         .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
@@ -49,7 +49,7 @@
     
     <div class="input-group">
         <label>最大ダメージ</label>
-        <input type="number" id="maxDamage" value="138" step="any">
+        <input type="number" id="maxDamage" value="100.1" step="any">
     </div>
 
     <div class="input-group">
@@ -59,7 +59,7 @@
 
     <div class="input-group">
         <label>基本無視率 (%)</label>
-        <input type="number" id="ignoreRate" value="60.2285" step="any">
+        <input type="number" id="ignoreRate" value="60.0000" step="any">
     </div>
 
     <div class="button-container">
@@ -113,7 +113,7 @@
         
         let bonus = 0;
         if (isCoreActive) bonus += 15;
-        if (isVskillActive) bonus += 15; // 20から15へ変更
+        if (isVskillActive) bonus += 15; 
 
         let totalIgnoreRate = baseIgnore + bonus;
         if (totalIgnoreRate > 100) totalIgnoreRate = 100;
@@ -136,4 +136,5 @@
 </script>
 
 </body>
+
 </html>
