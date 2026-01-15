@@ -64,10 +64,10 @@
 
     <div class="button-container">
         <button type="button" id="specialCoreBtn" class="toggle-button core">
-            特殊コア <span>+25%</span>
+            特殊コア <span>(無視25%)</span>
         </button>
         <button type="button" id="vSkillBtn" class="toggle-button v-skill">
-            Vスキル <span>+15%</span>
+            Vスキル <span>(無視15%)</span>
         </button>
     </div>
 
@@ -109,22 +109,28 @@
     function calculate() {
         const d = parseFloat(maxDamageInput.value) || 0;
         const def = parseFloat(defenseRateInput.value) || 0;
-        const baseIgnore = parseFloat(ignoreRateInput.value) || 0;
+        const baseIgnoreDecimal = (parseFloat(ignoreRateInput.value) || 0) / 100;
         
-        let bonus = 0;
-        if (isCoreActive) bonus += 25;
-        if (isVskillActive) bonus += 15; 
+        // 残り（1-無視率）を計算
+        let remain = (1 - baseIgnoreDecimal);
 
-        let totalIgnoreRate = baseIgnore + bonus;
-        if (totalIgnoreRate > 100) totalIgnoreRate = 100;
+        // 特殊コア有効なら 0.75を掛ける
+        if (isCoreActive) remain *= 0.75;
+        // Vスキル有効なら 0.85を掛ける
+        if (isVskillActive) remain *= 0.85;
 
-        const ignoreDecimal = totalIgnoreRate / 100;
-        const result = d * (1 - (def * (1 - ignoreDecimal)));
+        // 最終的な適用無視率を算出
+        const totalIgnoreDecimal = 1 - remain;
+        const totalIgnorePercent = totalIgnoreDecimal * 100;
+
+        // ダメージ計算
+        const result = d * (1 - (def * (1 - totalIgnoreDecimal)));
         
+        // 結果表示
         resultDisplay.innerText = result.toLocaleString(undefined, { maximumFractionDigits: 6 });
         
-        let statusText = `適用無視率: ${totalIgnoreRate.toFixed(4)}%`;
-        if (bonus > 0) statusText += ` (${baseIgnore}% + ボーナス${bonus}%)`;
+        // 内訳表示の更新
+        let statusText = `適用無視率: ${totalIgnorePercent.toFixed(4)}%`;
         currentIgnoreDisplay.innerText = statusText;
     }
 
@@ -136,6 +142,4 @@
 </script>
 
 </body>
-
 </html>
-
