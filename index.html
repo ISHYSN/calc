@@ -64,7 +64,7 @@
 
     <div class="button-container">
         <button type="button" id="specialCoreBtn" class="toggle-button core">
-            特殊コア <span>+15%</span>
+            特殊コア <span>+25%</span>
         </button>
         <button type="button" id="vSkillBtn" class="toggle-button v-skill">
             Vスキル <span>+15%</span>
@@ -112,7 +112,7 @@
         const baseIgnore = parseFloat(ignoreRateInput.value) || 0;
         
         let bonus = 0;
-        if (isCoreActive) bonus += 15;
+        if (isCoreActive) bonus += 25;
         if (isVskillActive) bonus += 15; 
 
         let totalIgnoreRate = baseIgnore + bonus;
@@ -138,3 +138,4 @@
 </body>
 
 </html>
+
